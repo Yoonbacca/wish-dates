@@ -5,7 +5,8 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-
+  const apiKey = import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY
+  console.log(apiKey)
   return (
     <>
       <div>
