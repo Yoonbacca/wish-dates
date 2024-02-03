@@ -1,17 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import { useState, useMemo } from 'react'
 import './App.css'
-import Home from './components/Home'
 
-function App() {
-  const [count, setCount] = useState(0)
-  const apiKey = import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY;
+const App = () => {
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY,
+  });
+  const center = useMemo(() => ({ lat: 18.52043, lng: 73.856743 }), []);
+
   return (
-    <>
-      <Home />      
-    </>
-  )
-}
+    <div className="App">
+      {!isLoaded ? (
+        <h1>Loading...</h1>
+      ) : (
+        <GoogleMap
+          mapContainerClassName="map-container"
+          center={center}
+          zoom={10}
+        />
+      )}
+    </div>
+  );
+};
 
-export default App
+export default App;
