@@ -1,5 +1,5 @@
-import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
-import { React, useState, useMemo, } from 'react'
+import { GoogleMap, MarkerF, useJsApiLoader, Autocomplete} from "@react-google-maps/api";
+import { React, useState, useMemo, useRef } from 'react'
 import {
   Box,
   Button,
@@ -17,12 +17,46 @@ const center = {lat: 41.8781, lng: -87.6298}
 const App = () => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY || "",
+    libraries: ['places'], // Enables places api
   })
 
   const [map, setMap] = useState( /** @type google.maps.Map */ (null)) // Study this more later
 
+  const [directionsResponse, setDirectionsResponse] = useState(null)
+  const [distance, setDistance] = useState('')
+  const [duration, setDuration] = useState('')
+
+  /** @type React.MutableRefobject<HTMLInputElement> */
+  const originRef = useRef()
+  /** @type React.MutableRefobject<HTMLInputElement> */
+  const destinationRef = useRef()
+
   if (!isLoaded) {
     return <div>Loading</div>
+  }
+
+  async function calculateRoute() {
+    if (originRef.current.value === "" || destinationRef.current.value === "") {
+      return
+    }
+    const directionsService = new google.maps.DirectionsService()
+    const results = await directionsService.route({
+      origin: originRef.current.value,
+      destination: destinationRef.current.value(),
+      travelMode: google.maps.TravelMode.DRIVING
+    })
+    setDirectionsResponse(results)
+    setDistance(results.routes[0].legs[0].distance.text)
+    setDuration(results.routes[0].legs[0].duration.text)
+
+  }
+
+  function clearRoute() {
+    setDirectionsResponse(null)
+    setDistance("")
+    setDuration("")
+    originRef.current.value = ""
+    destinationRef.current.value = ""
   }
 
   return (
@@ -60,19 +94,23 @@ const App = () => {
         bgColor='white'
         shadow='base'
         minW='container.md'
-        zIndex='modal'
+        zIndex='1'
       >
         <HStack spacing={4}>
-          <Input type='text' placeholder='Origin' />
-          <Input type='text' placeholder='Destination' />
+          <Autocomplete style={{ position: 'absolute', zIndex: 999 }}>
+            <Input type='text' placeholder='Origin' ref={originRef}/>
+          </Autocomplete>
+          <Autocomplete style={{ position: 'absolute', zIndex: 999 }}>
+            <Input type='text' placeholder='Destination' ref={destinationRef}/>
+          </Autocomplete>
           <ButtonGroup>
-            <Button colorScheme='pink' type='submit'>
+            <Button colorScheme='pink' type='submit' onClick={calculateRoute}>
               Calculate Route
             </Button>
             <IconButton
               aria-label='center back'
               icon={<FaTimes />}
-              onClick={() => alert(123)}
+              onClick={clearRoute}
             />
           </ButtonGroup>
         </HStack>
