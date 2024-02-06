@@ -1,4 +1,4 @@
-import { GoogleMap, MarkerF, useJsApiLoader, Autocomplete} from "@react-google-maps/api";
+import { GoogleMap, MarkerF, useJsApiLoader, Autocomplete, DirectionsRenderer} from "@react-google-maps/api";
 import { React, useState, useMemo, useRef } from 'react'
 import {
   Box,
@@ -83,6 +83,7 @@ const App = () => {
           onLoad={(map)=> setMap(map)}
           >
             <MarkerF position={center} />
+            {directionsResponse && (<DirectionsRenderer directions={directionsResponse}/>)}
           {/* Display markers or directions */}
         </GoogleMap>
       </Box>
