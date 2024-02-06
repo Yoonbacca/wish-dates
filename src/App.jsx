@@ -19,6 +19,8 @@ const App = () => {
     googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY || "",
   })
 
+  const [map, setMap] = useState( /** @type google.maps.Map */ (null)) // Study this more later
+
   if (!isLoaded) {
     return <div>Loading</div>
   }
@@ -43,7 +45,9 @@ const App = () => {
             streetViewControl: false,
             mapTypeControl: false,
             fullscreenControl: false,
-          }}>
+          }}
+          onLoad={(map)=> setMap(map)}
+          >
             <MarkerF position={center} />
           {/* Display markers or directions */}
         </GoogleMap>
@@ -79,7 +83,7 @@ const App = () => {
             aria-label='center back'
             icon={<FaLocationArrow />}
             isRound
-            onClick={() => alert(123)}
+            onClick={() => map.panTo(center)}
           />
         </HStack>
       </Box>
